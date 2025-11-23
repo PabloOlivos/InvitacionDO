@@ -640,7 +640,7 @@
                 const docRef = doc(db, rsvpCollectionPath, email.replace(/[.$#[\]/]/g, '_')); 
                 await setDoc(docRef, rsvpData);
 
-                showMessage(`¡Registro exitoso! Tu asistencia ha sido confirmada. ¡Nos vemos en Despecho!`, true);
+                showMessage(`¡Registro exitoso! Tu asistencia ha sido confirma DO. ¡Nos vemos en Despecho!`, true);
                 rsvpForm.reset(); // Limpiar el formulario
                 
             } catch (error) {
