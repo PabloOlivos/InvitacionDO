@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fiesta de Fin de Año</title>
+    <!-- Carga de Tailwind CSS --><script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- CARGA DE FUENTES DE GOOGLE (Poppins y Monoton) -->
+    <link href="https://fonts.googleapis.com/css2?family=Monoton&family=Poppins:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Estilos personalizados y variables basadas en el tema de Despecho */
+        :root {
+            --neon-pink: #E91E63; /* Color de acento principal */
+            --dark-background: #111111; /* Negro muy oscuro */
+            --light-text: #F3F4F6; /* Gris muy claro para textos */
+            --light-pink-text: #FEE7F0; /* Rosa muy claro para texto del menú */
+        }
+
+        body {
+            /* Fuente principal para el cuerpo y elementos legibles */
+            font-family: 'Poppins', sans-serif; 
+            background-color: var(--dark-background);
+            color: var(--light-text);
+            padding: 0;
+            margin: 0;
+        }
+        
+        /* ----------------------------------------------------------------- */
+        /* --- ESTILOS DE FUENTES ESPECÍFICAS --- */
+        /* ----------------------------------------------------------------- */
+        .header-title {
+            /* Fuente impactante para el título principal */
+            font-family: 'Monoton', cursive;
+            letter-spacing: 0.2em; /* Más espacio entre letras para el efecto neón */
+        }
+
+        .neon-text {
+            /* Título grande con efecto de brillo */
+            color: var(--neon-pink);
+            font-weight: 900;
+            letter-spacing: 0.1em;
+            text-shadow: 0 0 10px rgba(233, 30, 99, 0.7), 0 0 20px rgba(233, 30, 99, 0.3);
+            text-transform: uppercase;
+        }
+        
+        /* ----------------------------------------------------------------- */
+        /* --- ESTILOS DE COMPONENTES GENERALES --- */
+        /* ----------------------------------------------------------------- */
+        #home-section {
+            position: relative;
+            overflow: hidden; 
+            min-height: 80vh; 
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        #home-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            /* URL de imagen proporcionada por el usuario: Luces de fiesta */
+            background-image: url('https://plus.unsplash.com/premium_photo-1683129651802-1c7ba429a137?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8Zmllc3RhJTIwZGUlMjBiYWlsZXxlbnwwfHwwfHx8MA%3D%3D'); 
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            
+            /* Aplicar filtro de desenfoque (blur: 5px) y oscurecer (brightness: 0.5) */
+            filter: blur(5px) brightness(0.5); 
+            z-index: -1; 
+            /* Escalar ligeramente para cubrir completamente los bordes del blur */
+            transform: scale(1.05); 
+        }
+        
+        /* ----------------------------------------------------------------- */
+        /* --- CUENTA REGRESIVA --- */
+        /* ----------------------------------------------------------------- */
+        .countdown-container {
+            /* Fondo oscuro semi-transparente para la cuenta regresiva, para asegurar legibilidad */
+            background-color: rgba(0, 0, 0, 0.7); 
+            border: 2px solid var(--neon-pink);
+            box-shadow: 0 0 15px rgba(233, 30, 99, 0.5);
+        }
+        .countdown-unit {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            /* Asegurar que el espacio entre unidades sea suficiente en móvil */
+            padding: 0 4px;
+        }
+        .countdown-number {
+            /* TAMAÑO MÓVIL (sm:text-4xl, md:text-5xl, lg:text-7xl) */
+            color: var(--neon-pink);
+            font-size: 2rem; /* Tamaño base para móvil */
+            font-weight: 800;
+            line-height: 1;
+            text-shadow: 0 0 8px rgba(233, 30, 99, 0.9);
+        }
+        @media (min-width: 640px) { /* sm breakpoint */
+            .countdown-number {
+                font-size: 2.5rem; 
+            }
+        }
+        @media (min-width: 768px) {
+            .countdown-number {
+                font-size: 4rem; 
+            }
+        }
+        .countdown-label {
+            color: var(--light-text);
+            font-size: 0.6rem; /* Más pequeño en móvil */
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-top: 0.25rem;
+        }
+        @media (min-width: 640px) { /* sm breakpoint */
+            .countdown-label {
+                font-size: 0.75rem; 
+            }
+        }
+        
+        /* ----------------------------------------------------------------- */
+        /* --- ESTILOS DE BOTONES/INPUTS --- */
+        /* ----------------------------------------------------------------- */
+        .btn-neon {
+            background-color: var(--neon-pink);
+            border: 2px solid var(--neon-pink);
+            transition: all 0.3s ease-in-out;
+            box-shadow: 0 0 10px rgba(233, 30, 99, 0.5);
+            font-weight: 700;
+            color: var(--light-text); /* Aseguramos que el texto sea claro */
+        }
+
+        .btn-neon:hover:not(:disabled) {
+            background-color: #C2185B;
+            box-shadow: 0 0 20px rgba(233, 30, 99, 1);
+            transform: translateY(-2px);
+        }
+        
+        .btn-neon:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .neon-input:focus {
+            border-color: var(--neon-pink) !important;
+            box-shadow: 0 0 0 3px rgba(233, 30, 99, 0.5);
+        }
+
+        .details-section {
+            background-color: #1a1a1a;
+            border-top: 1px solid rgba(233, 30, 99, 0.4);
+            border-bottom: 1px solid rgba(233, 30, 99, 0.4);
+        }
+
+        .neon-divider {
+            height: 2px;
+            background-color: var(--neon-pink);
+            box-shadow: 0 0 8px rgba(233, 30, 99, 0.5);
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .nav-link-neon {
+            color: var(--light-pink-text);
+            transition: all 0.3s ease-in-out;
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+        }
+        
+        .nav-link-neon:hover {
+            /* En hover, cambiamos el color de texto a oscuro y quitamos la sombra para el efecto de neón apagado */
+            color: var(--dark-background); 
+            text-shadow: none;
+        }
+    </style>
+</head>
+<body class="p-0 min-h-screen flex flex-col">
+    
+    <!-- BARRA DE NAVEGACIÓN -->
+    <nav class="sticky top-0 z-50 bg-[var(--neon-pink)] shadow-xl border-b border-white/50">
+        <!-- Inner wrapper to center and limit content width -->
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-center h-16">
+                <div class="flex space-x-4 sm:space-x-8 text-sm sm:text-lg"> 
+                    <a href="#home-section" class="nav-link nav-link-neon font-semibold uppercase tracking-wider">Home</a>
+                    <a href="#details-section" class="nav-link nav-link-neon font-semibold uppercase tracking-wider">Detalles</a>
+                    <a href="#location-section" class="nav-link nav-link-neon font-semibold uppercase tracking-wider">Ubicación</a>
+                    <a href="#registration-form" class="nav-link nav-link-neon font-semibold uppercase tracking-wider">Confirmar</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- HEADER / HERO SECTION -->
+    <header id="home-section" class="p-4 md:p-8 flex-grow flex flex-col justify-center items-center">
+        <!-- Inner wrapper to center and limit content width -->
+        <div class="max-w-6xl mx-auto w-full px-4"> 
+            
+            <!-- Logo más pequeño y centrado -->
+            <div class="flex flex-col items-center justify-center relative z-10 mb-6">
+                <img src="https://assets.zyrosite.com/cdn-cgi/image/format=auto,w=488,fit=crop,q=95/YNqJe80GbMC0nRLQ/despecho_web_logo_cabeza-m6LwB1GQb3tGL4W1.png" alt="Logo Despecho Tepeyac" 
+                     class="h-16 md:h-20 object-contain">
+            </div>
+            
+            <!-- Título Principal con estética de Despecho -->
+            <div class="text-center mb-10 relative z-10 w-full">
+                <!-- APLICA LA FUENTE MONOTON AQUÍ -->
+                <h1 class="header-title text-4xl sm:text-6xl md:text-8xl neon-text tracking-widest leading-tight">
+                    Despecha - DO
+                </h1>
+                <!-- El subtítulo sigue usando Poppins con el estilo neon-text -->
+                <p class="text-lg sm:text-xl md:text-3xl font-light mt-4 text-white uppercase tracking-widest">
+                    Fiesta de fin de año 2025
+                </p>
+            </div>
+
+            <!-- CUENTA REGRESIVA -->
+            <div id="countdown-container" class="countdown-container max-w-sm sm:max-w-2xl mx-auto p-4 md:p-6 rounded-xl text-white text-center relative z-10">
+                <h3 class="text-xs sm:text-sm md:text-lg uppercase tracking-widest font-bold mb-4 text-gray-300">
+                    Faltan para el Despecho de Año Nuevo:
+                </h3>
+                <!-- Contenedor flex con espacio reducido en móvil -->
+                <div id="countdown-timer" class="flex justify-around items-center">
+                    <!-- Días -->
+                    <div class="countdown-unit">
+                        <span id="days" class="countdown-number">00</span>
+                        <span class="countdown-label">Días</span>
+                    </div>
+                    <!-- Separador -->
+                    <span class="countdown-number text-2xl sm:text-4xl md:text-5xl">:</span>
+                    <!-- Horas -->
+                    <div class="countdown-unit">
+                        <span id="hours" class="countdown-number">00</span>
+                        <span class="countdown-label">Horas</span>
+                    </div>
+                    <!-- Separador -->
+                    <span class="countdown-number text-2xl sm:text-4xl md:text-5xl">:</span>
+                    <!-- Minutos -->
+                    <div class="countdown-unit">
+                        <span id="minutes" class="countdown-number">00</span>
+                        <span class="countdown-label">Minutos</span>
+                    </div>
+                    <!-- Separador -->
+                    <span class="countdown-number text-2xl sm:text-4xl md:text-5xl">:</span>
+                    <!-- Segundos -->
+                    <div class="countdown-unit">
+                        <span id="seconds" class="countdown-number">00</span>
+                        <span class="countdown-label">Segundos</span>
+                    </div>
+                </div>
+                <!-- Mensaje al finalizar el contador -->
+                <div id="countdown-finished" class="text-xl font-bold neon-text hidden mt-4">
+                    ¡EL DESPECHO DE FIN DE AÑO HA COMENZADO!
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- SECCIÓN DE DETALLES DEL EVENTO -->
+    <section id="details-section" class="details-section p-8 md:p-12 text-center">
+        <!-- Inner wrapper to center and limit content width -->
+        <div class="max-w-6xl mx-auto">
+            <h2 class="text-3xl font-extrabold mb-8 neon-text">Detalles del Evento</h2>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-8 text-center">
+                <div class="flex flex-col items-center">
+                    <p class="text-3xl font-extrabold neon-text mb-1">19 Dic</p>
+                    <p class="text-lg text-gray-400">FECHA</p>
+                </div>
+                <div class="flex flex-col items-center">
+                    <p class="text-3xl font-extrabold neon-text mb-1">8:00 PM</p>
+                    <p class="text-lg text-gray-400">HORA</p>
+                </div>
+                <div class="flex flex-col items-center">
+                    <p class="text-3xl font-extrabold neon-text mb-1">Parque Tepeyac</p>
+                    <p class="text-lg text-gray-400">LUGAR</p>
+                </div>
+            </div>
+            
+            <div class="neon-divider w-full md:w-1/2 mx-auto my-6"></div>
+            
+            <!-- BOTÓN PARA AGENDAR EN EL CALENDARIO -->
+            <button id="addToCalendarBtn" class="btn-neon w-full sm:w-auto mt-8 py-3 px-6 sm:px-8 rounded-lg shadow-xl uppercase tracking-widest text-base sm:text-lg transition duration-300 mx-auto">
+                <span class="flex items-center justify-center">
+                    <!-- Icono de calendario -->
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    AGENDAR EN MI CALENDARIO
+                </span>
+            </button>
+        </div>
+    </section>
+
+    <!-- SECCIÓN DE UBICACIÓN -->
+    <section id="location-section" class="p-8 md:p-12 text-center bg-black border-t border-gray-800">
+        <!-- Inner wrapper to center and limit content width -->
+        <div class="max-w-6xl mx-auto">
+            <h2 class="text-3xl font-extrabold mb-8 neon-text">Ubicación</h2>
+            <div class="max-w-4xl mx-auto">
+                <p class="text-base text-gray-400 mb-6">Dirección: Eduardo Molina 6730-Local R-210, Granjas Modernas, Gustavo A. Madero, 07460 Ciudad de México, CDMX</p>
+                
+                <!-- Map Placeholder -->
+                <div class="rounded-xl overflow-hidden shadow-2xl border-4 border-neon-pink/50">
+                    <iframe 
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3761.485598943907!2d-99.10163432392267!3d19.477732981811428!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85d1fbaab3207dc7%3A0x429fa627670e4d4c!2sDespecho%20Parque%20Tepeyac!5e0!3m2!1ses-419!2smx!4v1763925396565!5m2!1ses-419!2smx"
+                        width="100%" 
+                        height="450" 
+                        style="border:0;" 
+                        allowfullscreen="" 
+                        loading="lazy" 
+                        referrerpolicy="no-referrer-when-downgrade"
+                        title="Ubicación del evento"
+                        class="w-full h-[300px] md:h-[450px]">
+                    </iframe>
+                   
+                </div>
+                
+                <!-- BOTÓN PARA ABRIR EN GOOGLE MAPS -->
+                <div class="mt-6">
+                    <a href="https://www.google.com/url?sa=t&source=web&rct=j&opi=89978449&url=/maps/dir//Despecho%2BParque%2BTepeyac,%2BEduardo%2BMolina%2B6730-Local%2BR-210,%2BGranjas%2BModernas,%2BGustavo%2BA.%2BMadero,%2B07460%2BCiudad%2Bde%2BM%25C3%25A9xico,%2BCDMX/data%3D!4m7!4m6!1m1!4e2!1m2!1m1!1s0x85d1fbaab3207dc7:0x429fa627670e4d4c!3e0%3Fsa%3DX%26ved%3D1t:3747%26ictx%3D111&ved=2ahUKEwixh7_n_oiRAxX3hu4BHXDbN00Qox16BAgjEBM&usg=AOvVaw0SRK9fX6UXfbiibwpZLtXr" target="_blank" 
+                       class="btn-neon inline-flex items-center justify-center 
+                              w-full sm:w-auto py-3 px-6 rounded-lg 
+                              shadow-lg uppercase tracking-widest text-base font-semibold
+                              transition duration-300 transform hover:scale-[1.02]">
+                        <!-- Ícono de Marcador de Mapa -->
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.828 0l-4.243-4.243a8 8 0 1111.314 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                        ¿Cómo llegar?
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECCIÓN DE FORMULARIO RSVP -->
+    <section id="registration-form" class="p-8 md:p-12 bg-gray-900 border-t border-gray-800">
+        <!-- Inner wrapper to center and limit content width -->
+        <div class="max-w-6xl mx-auto">
+            <div class="max-w-xl mx-auto bg-gray-900 p-6 md:p-10 rounded-xl border border-gray-700 shadow-2xl">
+                <h2 class="text-3xl font-extrabold mb-8 text-center neon-text">Confirma tu Asistencia</h2>
+                
+                <form id="rsvpForm" class="space-y-6">
+                    <!-- Mensaje de estado (éxito/error) -->
+                    <div id="messageBox" class="p-4 rounded-lg text-center hidden font-semibold" role="alert"></div>
+
+                    <div>
+                        <label for="name" class="block text-sm font-medium text-gray-400 mb-2 uppercase tracking-wider">Nombre Completo</label>
+                        <input type="text" id="name" name="name" required 
+                               class="neon-input w-full p-3 sm:p-4 bg-gray-800 border-2 border-gray-700 rounded-lg text-white placeholder-gray-500 transition duration-300">
+                    </div>
+
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-400 mb-2 uppercase tracking-wider">Correo Electrónico</label>
+                        <input type="email" id="email" name="email" required 
+                               class="neon-input w-full p-3 sm:p-4 bg-gray-800 border-2 border-gray-700 rounded-lg text-white placeholder-gray-500 transition duration-300">
+                    </div>
+                    
+                    <!-- Botón de formulario -->
+                    <button type="submit" class="btn-neon w-full text-white py-3 sm:py-4 rounded-lg shadow-xl uppercase tracking-widest text-base sm:text-lg">
+                        <span class="flex items-center justify-center">
+                            <!-- Icono de confirmación (checkmark en círculo) -->
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                                <polyline points="22 4 12 14.01 9 11.01"/>
+                            </svg>
+                            Confirmar asistencia
+                        </span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </section>
+        
+    <!-- SECCIÓN DE GENERADOR DE VIBRA AI -->
+    <section class="p-8 md:p-12 bg-black border-t border-gray-800">
+        <!-- Inner wrapper to center and limit content width -->
+        <div class="max-w-6xl mx-auto">
+            <div class="max-w-xl mx-auto">
+                <h2 class="text-3xl font-extrabold mb-6 text-center neon-text">Generador de VIBRA ✨</h2>
+                <p class="text-center text-gray-400 mb-6 text-sm sm:text-base">
+                    Describe el tipo de ambiente que buscas y genera un eslogan de fiesta impactante para compartir en redes sociales.
+                </p>
+
+                <div class="space-y-4">
+                    <div>
+                        <label for="vibeInput" class="block text-sm font-medium text-gray-400 mb-2 uppercase tracking-wider">Describe tu vibra ideal (ej: elegante, reggaetón, despecho total)</label>
+                        <input type="text" id="vibeInput" placeholder="Música bailable, formal, despedir el año"
+                               class="neon-input w-full p-3 sm:p-4 bg-gray-800 border-2 border-gray-700 rounded-lg text-white placeholder-gray-500 transition duration-300">
+                    </div>
+
+                    <button id="generateSloganBtn" class="btn-neon w-full text-white py-3 rounded-lg shadow-xl uppercase tracking-widest text-base">
+                        Generar Eslogan de Despecho ✨
+                    </button>
+                    
+                    <!-- Área de Salida -->
+                    <div id="sloganOutput" class="mt-4 p-4 rounded-lg text-center hidden bg-gray-800 border-2 border-neon-pink">
+                        <p class="text-lg sm:text-xl font-bold neon-text" id="sloganText"></p>
+                        <p class="text-xs mt-2 text-gray-500" id="sloganSources"></p>
+                    </div>
+                    <div id="loadingSlogan" class="hidden text-center text-neon-pink p-4">
+                        <p class="animate-pulse">Generando la vibra perfecta...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="p-8 text-center bg-gray-900 border-t border-gray-800">
+        <div class="max-w-6xl mx-auto">
+            <p class="text-xs text-gray-600 uppercase tracking-widest">
+                Te esperamos para despedir el año con la mejor música y ambiente Despecho.
+            </p>
+            <br>
+            <p class="text-xs text-gray-600 uppercase tracking-widest">
+                Creado por Pablo Olivos
+            </p>
+        </div>
+    </footer>
+
+    <!-- Script de lógica de Firebase y API (como módulo) -->
+    <script type="module">
+        // --- 1. IMPORTACIONES MODULARES DE FIREBASE (NECESARIAS PARA 'type="module"') ---
+        // Estos enlaces URL son obligatorios para cargar los SDKs de Firebase de forma modular.
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, collection, getDocs, query } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        
+        // --- 2. GESTIÓN DE LA CONFIGURACIÓN (Manejo de entorno local vs. Canvas) ---
+        
+        // Variables globales proporcionadas automáticamente por el entorno de Canvas (si existe)
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null; 
+        
+        let firebaseConfig = {};
+
+        // Verificamos si la configuración de Canvas está disponible
+        if (typeof __firebase_config !== 'undefined') {
+            firebaseConfig = JSON.parse(__firebase_config);
+        } else {
+            // =========================================================================
+            // !!! INSTRUCCIÓN CLAVE PARA VISUAL STUDIO CODE !!!
+            // Si estás ejecutando esto localmente (file:///) y quieres que Firebase funcione, 
+            // DEBES reemplazar los valores VACÍOS ("") con tu configuración real que obtuviste
+            // en el Paso 2 de la Consola de Firebase.
+            // =========================================================================
+            firebaseConfig = {
+                apiKey: "AIzaSyD4tUhAZ11bp77XY7CBpQg-05A6VXODqWk",
+                authDomain: "invitacion-72ab0.firebaseapp.com",
+                projectId: "invitacion-72ab0",
+                storageBucket: "invitacion-72ab0.firebasestorage.app",
+                messagingSenderId: "520486344548",
+                appId: "1:520486344548:web:c7c1920919b15fd97bcc71",
+  
+            };
+            
+            // Si la configuración local sigue vacía, emitimos una advertencia.
+            if (!firebaseConfig.apiKey) {
+                console.warn("Advertencia: Firebase no se inicializará. Debes reemplazar los placeholders de firebaseConfig para que funcione localmente en VS Code.");
+            }
+        }
+        
+        const apiKey = "AIzaSyCh5PqCdR384Box7r-D3D0Q70aQU8tUAEQ"; // La clave de API de Gemini es proporcionada por el entorno si se deja vacía.
+
+        let db, auth;
+        let isAuthReady = false;
+
+        const messageBox = document.getElementById('messageBox');
+        const rsvpForm = document.getElementById('rsvpForm');
+        const addToCalendarBtn = document.getElementById('addToCalendarBtn');
+        
+        // Elementos para el Generador de VIBRA ✨
+        const generateSloganBtn = document.getElementById('generateSloganBtn');
+        const vibeInput = document.getElementById('vibeInput');
+        const sloganOutput = document.getElementById('sloganOutput');
+        const sloganText = document.getElementById('sloganText');
+        const sloganSources = document.getElementById('sloganSources');
+        const loadingSlogan = document.getElementById('loadingSlogan');
+        
+        /**
+         * Muestra mensajes de estado (éxito/error) en el formulario.
+         * @param {string} message - El texto del mensaje.
+         * @param {boolean} isSuccess - Verdadero para éxito (verde), falso para error (rojo).
+         */
+        function showMessage(message, isSuccess) {
+            messageBox.textContent = message;
+            // Configuración de colores para mensajes de neón
+            messageBox.classList.remove('hidden', 'bg-red-900', 'bg-green-900', 'text-red-300', 'text-green-300');
+            
+            if (isSuccess) {
+                // Estilo neón verde para éxito
+                messageBox.classList.add('bg-green-900', 'text-green-300', 'shadow-green-500/50');
+            } else {
+                // Estilo neón rojo para error
+                messageBox.classList.add('bg-red-900', 'text-red-300', 'shadow-red-500/50');
+            }
+            
+            messageBox.classList.remove('hidden');
+
+            setTimeout(() => {
+                messageBox.classList.add('hidden');
+            }, 5000);
+        }
+
+        /**
+         * Inicializa Firebase y autentica al usuario.
+         */
+        async function initializeFirebase() {
+            // Aseguramos que tengamos la API Key para intentar la inicialización
+            if (!firebaseConfig.apiKey || Object.keys(firebaseConfig).length === 0) {
+                console.error("Firebase no se inicializó porque la configuración no está disponible.");
+                // Si falla la inicialización de Firebase, el formulario de RSVP no funcionará.
+                rsvpForm.querySelector('button[type="submit"]').disabled = true;
+                showMessage("Modo sin conexión. La confirmación de asistencia (RSVP) está deshabilitada.", false);
+                return;
+            }
+            
+            try {
+                const app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+                
+                // Autenticación usando el token de Canvas o anónimamente para local
+                if (initialAuthToken) {
+                    await signInWithCustomToken(auth, initialAuthToken);
+                } else {
+                    await signInAnonymously(auth);
+                }
+                
+                isAuthReady = true;
+                console.log("Firebase inicializado y usuario autenticado.");
+                
+            } catch (error) {
+                console.error("Error durante la inicialización de Firebase o autenticación:", error);
+                showMessage("Error al iniciar conexión con Firebase. La función RSVP no funcionará.", false);
+            }
+        }
+        
+        /**
+         * Genera y descarga un archivo .ics para agregar el evento al calendario.
+         */
+        function addToCalendar() {
+            const title = "InvitaDO al Despecho de Fin de Año";
+            const location = "Eduardo Molina 6730-Local R-210, Granjas Modernas, Gustavo A. Madero, CDMX";
+            const description = "¡La última noche del año con la mejor vibra Despecho! No faltes a esta fiesta inolvidable en Parque Tepeyac.";
+
+            // FECHAS: Start: Dec 19, 2025, 20:00:00 / End: Dec 20, 2025, 02:00:00 (6 horas de evento)
+            const startDate = "20251219T200000";
+            const endDate = "20251220T020000"; 
+            
+            // Generación del contenido ICS
+            const icsContent = [
+                'BEGIN:VCALENDAR',
+                'VERSION:2.0',
+                'PRODID:-//Despecho//Event Calendar//EN',
+                'BEGIN:VEVENT',
+                `UID:${new Date().getTime()}@despecho.mx`, 
+                `DTSTAMP:${new Date().toISOString().replace(/[-:]|\.\d{3}/g, '').substring(0, 15)}Z`,
+                `DTSTART:${startDate}`, 
+                `DTEND:${endDate}`,     
+                `SUMMARY:${title}`,
+                `LOCATION:${location}`,
+                `DESCRIPTION:${description}`,
+                'END:VEVENT',
+                'END:VCALENDAR'
+            ].join('\n');
+
+            // Creación del Blob y el enlace de descarga
+            const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            
+            // Simular clic en un enlace de descarga
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', 'Despecho_FinDeAnio.ics');
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+            
+            console.log("Archivo ICS generado y descarga iniciada.");
+        }
+
+        /**
+         * Guarda el registro de asistencia en Firestore.
+         * @param {Event} e - El evento de envío del formulario.
+         */
+        async function handleRsvp(e) {
+            e.preventDefault();
+            
+            if (!isAuthReady || !db || !auth) {
+                showMessage("La conexión a Firebase no está lista o falló.", false);
+                return;
+            }
+
+            const name = document.getElementById('name').value.trim();
+            const email = document.getElementById('email').value.trim();
+            
+            const userId = auth.currentUser?.uid || crypto.randomUUID();
+            
+            // Colección pública para los RSVPs: /artifacts/{appId}/public/data/rsvps
+            const rsvpCollectionPath = `artifacts/${appId}/public/data/rsvps`;
+            
+            try {
+                // 1. Verificar si el email ya existe para evitar duplicados
+                const q = query(collection(db, rsvpCollectionPath));
+                const querySnapshot = await getDocs(q);
+                let isDuplicate = false;
+                
+                querySnapshot.forEach((doc) => {
+                    if (doc.data().email.toLowerCase() === email.toLowerCase()) {
+                        isDuplicate = true;
+                    }
+                });
+                
+                if (isDuplicate) {
+                    showMessage("Ya existe un registro con este correo electrónico. ¡Gracias por confirmar!", false);
+                    return;
+                }
+
+                // 2. Crear el objeto de registro
+                const rsvpData = {
+                    name: name,
+                    email: email,
+                    timestamp: new Date().toISOString(),
+                    userId: userId,
+                };
+                
+                // 3. Guardar el registro en Firestore. 
+                // Usamos el correo saneado como ID del documento
+                const docRef = doc(db, rsvpCollectionPath, email.replace(/[.$#[\]/]/g, '_')); 
+                await setDoc(docRef, rsvpData);
+
+                showMessage(`¡Registro exitoso! Tu asistencia ha sido confirmada. ¡Nos vemos en Despecho!`, true);
+                rsvpForm.reset(); // Limpiar el formulario
+                
+            } catch (error) {
+                console.error("Error al registrar asistencia:", error);
+                showMessage("Hubo un error al guardar tu registro. Inténtalo de nuevo.", false);
+            }
+        }
+        
+        /**
+         * Realiza una llamada a la API de Gemini con manejo de reintentos.
+         * @param {object} payload - El cuerpo del payload de la API.
+         * @param {number} retries - Número de reintentos restantes.
+         */
+        async function fetchWithRetry(payload, retries = 5) {
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+            const delay = 500 * (5 - retries) * (5 - retries); 
+
+            if (retries < 5) {
+                await new Promise(resolve => setTimeout(resolve, delay));
+            }
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (response.status === 429 && retries > 0) {
+                    throw new Error("Rate limit exceeded.");
+                }
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                return await response.json();
+
+            } catch (error) {
+                if (retries > 0) {
+                    if (error.message.includes("Rate limit")) {
+                        console.warn(`Error de la API (Rate Limit), reintentando en ${delay / 1000}s... (${retries} reintentos restantes)`);
+                    } else {
+                        console.warn(`Error de la API (${error.message}), reintentando... (${retries} reintentos restantes)`);
+                    }
+                    return fetchWithRetry(payload, retries - 1);
+                }
+                throw new Error("Fallo la llamada a la API de Gemini después de varios reintentos.");
+            }
+        }
+
+        /**
+         * Genera un eslogan de fiesta usando la API de Gemini.
+         */
+        async function generateSlogan() {
+            const vibe = vibeInput.value.trim() || vibeInput.placeholder; 
+            
+            if (!vibe) return;
+
+            // Mostrar cargando
+            sloganOutput.classList.add('hidden');
+            loadingSlogan.classList.remove('hidden');
+            generateSloganBtn.disabled = true;
+
+            const systemPrompt = "Actúa como un experto en marketing de eventos nocturnos de alto nivel en español. Crea un eslogan corto (máximo 10 palabras), impactante y con temática neón/rosa y elegante para una fiesta de fin de año en un club. El tono debe ser moderno, atractivo y bailable. SOLO responde con el eslogan generado.";
+            const userQuery = `Basado en la siguiente descripción de la vibra: "${vibe}". Genera un eslogan único.`;
+            
+            const payload = {
+                contents: [{ parts: [{ text: userQuery }] }],
+                systemInstruction: { parts: [{ text: systemPrompt }] },
+            };
+
+            try {
+                const result = await fetchWithRetry(payload);
+                
+                const candidate = result.candidates?.[0];
+
+                if (candidate && candidate.content?.parts?.[0]?.text) {
+                    const text = candidate.content.parts[0].text;
+                    sloganText.textContent = text;
+                    sloganSources.textContent = 'Generado por Gemini.'; 
+                    sloganOutput.classList.remove('hidden');
+                    sloganOutput.classList.remove('bg-red-900', 'text-red-300');
+                    sloganOutput.classList.add('bg-gray-800');
+                } else {
+                    sloganText.textContent = "No se pudo generar un eslogan. Intenta con otra descripción de vibra.";
+                    sloganSources.textContent = '';
+                    sloganOutput.classList.remove('hidden');
+                    sloganOutput.classList.remove('bg-gray-800');
+                    sloganOutput.classList.add('bg-red-900', 'text-red-300'); // Estilo de error
+                }
+
+            } catch (error) {
+                console.error("Error al generar el eslogan:", error);
+                sloganText.textContent = "Error de conexión. Inténtalo de nuevo más tarde.";
+                sloganSources.textContent = '';
+                sloganOutput.classList.remove('hidden');
+                sloganOutput.classList.add('bg-red-900', 'text-red-300'); // Estilo de error
+            } finally {
+                loadingSlogan.classList.add('hidden');
+                generateSloganBtn.disabled = false;
+            }
+        }
+
+        // --- Manejo de Desplazamiento Suave (Smooth Scrolling) ---
+        document.querySelectorAll('.nav-link').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+
+                if (targetElement) {
+                    // La altura de la barra de navegación es h-16 (64px)
+                    const headerOffset = 64; 
+                    const elementPosition = targetElement.getBoundingClientRect().top;
+                    const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+                    window.scrollTo({
+                        top: offsetPosition,
+                        behavior: "smooth"
+                    });
+                }
+            });
+        });
+
+        // --- Inicialización y Event Listeners ---
+        document.addEventListener('DOMContentLoaded', () => {
+             // 1. Inicializa Firebase y la autenticación
+            initializeFirebase();
+             // 2. Asigna listeners
+            rsvpForm.addEventListener('submit', handleRsvp);
+            generateSloganBtn.addEventListener('click', generateSlogan);
+            addToCalendarBtn.addEventListener('click', addToCalendar); 
+        });
+       
+    </script>
+
+    <!-- Script de lógica de la Cuenta Regresiva (Sin 'module' para asegurar ejecución local) -->
+    <script>
+        // Elementos del Contador 
+        const daysEl = document.getElementById('days');
+        const hoursEl = document.getElementById('hours');
+        const minutesEl = document.getElementById('minutes');
+        const secondsEl = document.getElementById('seconds');
+        const countdownTimerEl = document.getElementById('countdown-timer');
+        const countdownFinishedEl = document.getElementById('countdown-finished');
+        
+        // FECHA Y HORA OBJETIVO
+        const targetDate = new Date("December 19, 2025 20:00:00").getTime(); 
+        let countdownInterval;
+
+        /**
+         * Actualiza el contador cada segundo.
+         */
+        function updateCountdown() {
+            const now = new Date().getTime();
+            const distance = targetDate - now;
+
+            // Cálculos de tiempo
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            // Mostrar el resultado en los elementos
+            daysEl.textContent = days < 10 ? '0' + days : days;
+            hoursEl.textContent = hours < 10 ? '0' + hours : hours;
+            minutesEl.textContent = minutes < 10 ? '0' + minutes : minutes;
+            secondsEl.textContent = seconds < 10 ? '0' + seconds : seconds;
+
+            // Cuando la cuenta regresiva termina
+            if (distance < 0) {
+                clearInterval(countdownInterval);
+                countdownTimerEl.classList.add('hidden');
+                countdownFinishedEl.classList.remove('hidden');
+            }
+        }
+        
+        /**
+         * Inicia el proceso de cuenta regresiva.
+         */
+        function startCountdown() {
+            // Verifica que los elementos existen antes de intentar actualizarlos
+            if (daysEl) {
+                updateCountdown(); // Llamar inmediatamente para evitar el parpadeo
+                countdownInterval = setInterval(updateCountdown, 1000);
+            }
+        }
+        
+        // Iniciar el contador una vez que el DOM está completamente cargado.
+        document.addEventListener('DOMContentLoaded', startCountdown);
+    </script>
+</body>
+</html>
