@@ -319,7 +319,7 @@
                 <!-- Map Placeholder -->
                 <div class="rounded-xl overflow-hidden shadow-2xl border-4 border-neon-pink/50">
                     <iframe 
-                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3761.485598943907!2d-99.10163432392267!3d19.477732981811428!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85d1fbaab3207dc7%3A0x429fa627670e4d4c!2sDespecho%20Parque%20Tepeyac!5e0!3m2!1ses-419!2smx!4v1763925396565!5m2!1ses-419!2smx"
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3761.485598943907!2d-99.10163432392267!3d19.477732981811428!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85d1fbaab3207dc7%3A0x429fa627670e4d4c!2sDespecho%20Parque%2BTepeyac!5e0!3m2!1ses-419!2smx!4v1763925396565!5m2!1ses-419!2smx"
                         width="100%" 
                         height="450" 
                         style="border:0;" 
@@ -491,11 +491,9 @@
         // CLAVE PROPORCIONADA POR EL USUARIO: Se usa para que la generación de VIBRA funcione fuera del entorno de Canvas.
         const apiKey = "AIzaSyCh5PqCdR384Box7r-D3D0Q70aQU8tUAEQ"; 
         
-        // 🚨 CAMBIA ESTA URL! 🚨 
-        // Esta es la URL de tu Google Apps Script que configuraste.
-        // Cópiala de la implementación de tu "Aplicación web".
-        const GOOGLE_SHEETS_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbyvuPuz5cKDTRekKR4s7g5fLT18gB32vP2acBp7uD6rlQiTYplolcNa32iWR1NU1EZo2Q/exec"; 
-        // 🚨 CAMBIA ESTA URL! 🚨
+        // 🚨 ¡IMPORTANTE! REEMPLAZA ESTA URL CON LA URL DE TU APLICACIÓN WEB DE APPS SCRIPT 🚨
+        const GOOGLE_SHEETS_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbzPRFnkMbM9vfiuQBN6b6LlWGToqduQOi1wv-3jvZukDDu_FXyOJCBCCCtsi9ttg8wSJQ/exec"; 
+        // 🚨 ¡IMPORTANTE! REEMPLAZA ESTA URL CON LA URL DE TU APLICACIÓN WEB DE APPS SCRIPT 🚨
 
         let db, auth;
         let isAuthReady = false;
@@ -576,30 +574,46 @@
          * @param {object} data - Los datos de Nombre y Email del RSVP.
          */
         async function sendToGoogleSheets(data) {
+            // 1. VERIFICACIÓN CRÍTICA DEL PLACEHOLDER DE LA URL
             if (GOOGLE_SHEETS_WEBHOOK_URL.includes("REEMPLAZA")) {
-                console.warn("ADVERTENCIA: La URL de Google Sheets no ha sido configurada. Saltando envío.");
+                console.error("ADVERTENCIA CRÍTICA: La URL de Google Sheets no ha sido configurada. Reemplaza 'REEMPLAZA_CON_TU_URL_DE_APPS_SCRIPT_AQUI' con la URL real de tu implementación de Apps Script.");
+                showMessage("Configuración incompleta: No se pudo enviar a Google Sheets. Revisa la consola.", false);
                 return;
             }
 
+            // 2. Loguear los datos que se van a enviar
+            console.log("Intentando enviar a Google Sheets con datos:", data);
+            
             try {
                 const response = await fetch(GOOGLE_SHEETS_WEBHOOK_URL, {
                     method: 'POST',
-                    mode: 'cors', // Necesario para peticiones de aplicaciones web
+                    mode: 'cors', 
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify(data),
                 });
-
+                
+                // 3. Verificar si la respuesta fue HTTP 2xx
                 if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                    const errorText = await response.text();
+                    throw new Error(`Fallo HTTP: ${response.status} - ${errorText}`);
                 }
                 
-                // Si la respuesta fue exitosa, no hacemos nada, solo registramos.
-                console.log("Datos enviados correctamente a Google Sheets.");
+                // 4. Intentar parsear la respuesta JSON (si el script devuelve JSON)
+                const result = await response.json();
+                
+                if (result.status === 'Success') {
+                    console.log("Éxito al enviar datos a Google Sheets.", result);
+                } else {
+                    // Esto maneja errores de Apps Script (ej. si el JSON no se parseó correctamente en el script)
+                    console.error("El Apps Script respondió con un error:", result);
+                }
+                
 
             } catch (error) {
-                console.error("Error al enviar datos a Google Sheets:", error);
+                // Esto atrapa errores de red, CORS o el throw del HTTP 
+                console.error("Error al enviar datos a Google Sheets. Causa probable: CORS, URL incorrecta, o script no implementado.", error);
                 // No mostramos error al usuario final, ya que el RSVP en Firebase fue exitoso.
             }
         }
@@ -738,6 +752,7 @@
 
                 // 4. NUEVO: Enviar los datos a Google Sheets (en paralelo)
                 // Usamos solo name y email para el script de Google, ya que el timestamp lo genera el script.
+                // Esta llamada no bloquea el éxito del RSVP en Firebase.
                 sendToGoogleSheets({ name: name, email: email });
                 
                 showMessage(`¡Registro exitoso! Tu asistencia ha sido confirma DO. ¡Nos vemos en Despecho!`, true);
