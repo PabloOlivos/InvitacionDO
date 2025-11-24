@@ -486,7 +486,8 @@
             }
         }
         
-        const apiKey = "AIzaSyCh5PqCdR384Box7r-D3D0Q70aQU8tUAEQ"; // La clave de API de Gemini es proporcionada por el entorno si se deja vacía.
+        // CORRECCIÓN: La clave de la API de Gemini se deja vacía para que el entorno la inyecte.
+        const apiKey = ""; 
 
         let db, auth;
         let isAuthReady = false;
@@ -713,6 +714,7 @@
          * @param {number} retries - Número de reintentos restantes.
          */
         async function fetchWithRetry(payload, retries = 5) {
+            // El modelo y el endpoint son correctos. La clave se adjunta desde la variable global.
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
             const delay = 500 * (5 - retries) * (5 - retries); 
 
@@ -754,6 +756,14 @@
          * Genera un eslogan de fiesta usando la API de Gemini.
          */
         async function generateSlogan() {
+            // Se realiza una pequeña verificación si la clave está vacía para asegurar que el entorno la inyecte.
+            if (!apiKey && typeof __initial_auth_token !== 'undefined') {
+                // Si la clave es la variable vacía (lo esperado en Canvas), no hay problema.
+            } else if (!apiKey) {
+                 // Si estamos en local y la clave está vacía, mostramos advertencia.
+                 console.error("La clave de API de Gemini está vacía. La generación de eslóganes no funcionará sin una clave válida.");
+            }
+            
             const vibe = vibeInput.value.trim() || vibeInput.placeholder; 
             
             if (!vibe) return;
