@@ -277,17 +277,17 @@
             
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-8 text-center">
                 <div class="flex flex-col items-center">
-                    <!-- TEXTO CAMBIADO DE neon-text a text-white -->
+                    <!-- TEXTO ES BLANCO -->
                     <p class="text-3xl font-extrabold text-white mb-1">19 Dic</p>
                     <p class="text-lg text-gray-400">FECHA</p>
                 </div>
                 <div class="flex flex-col items-center">
-                    <!-- TEXTO CAMBIADO DE neon-text a text-white -->
+                    <!-- TEXTO ES BLANCO -->
                     <p class="text-3xl font-extrabold text-white mb-1">8:00 PM</p>
                     <p class="text-lg text-gray-400">HORA</p>
                 </div>
                 <div class="flex flex-col items-center">
-                    <!-- TEXTO CAMBIADO DE neon-text a text-white -->
+                    <!-- TEXTO ES BLANCO -->
                     <p class="text-3xl font-extrabold text-white mb-1">Parque Tepeyac</p>
                     <p class="text-lg text-gray-400">LUGAR</p>
                 </div>
@@ -480,7 +480,6 @@
                 storageBucket: "invitacion-72ab0.firebasestorage.app",
                 messagingSenderId: "520486344548",
                 appId: "1:520486344548:web:c7c1920919b15fd97bcc71",
-  
             };
             
             // Si la configuración local sigue vacía, emitimos una advertencia.
@@ -489,8 +488,14 @@
             }
         }
         
-        // CORRECCIÓN: La clave de la API de Gemini se deja vacía para que el entorno la inyecte.
-        const apiKey = "AIzaSyCTYu16DlktuJaudsNCYKbiOoEIWkd16LY"; 
+        // CLAVE PROPORCIONADA POR EL USUARIO: Se usa para que la generación de VIBRA funcione fuera del entorno de Canvas.
+        const apiKey = "AIzaSyCh5PqCdR384Box7r-D3D0Q70aQU8tUAEQ"; 
+        
+        // 🚨 CAMBIA ESTA URL! 🚨 
+        // Esta es la URL de tu Google Apps Script que configuraste.
+        // Cópiala de la implementación de tu "Aplicación web".
+        const GOOGLE_SHEETS_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbyvuPuz5cKDTRekKR4s7g5fLT18gB32vP2acBp7uD6rlQiTYplolcNa32iWR1NU1EZo2Q/exec"; 
+        // 🚨 CAMBIA ESTA URL! 🚨
 
         let db, auth;
         let isAuthReady = false;
@@ -498,7 +503,6 @@
         const messageBox = document.getElementById('messageBox');
         const rsvpForm = document.getElementById('rsvpForm');
         const addToCalendarBtn = document.getElementById('addToCalendarBtn');
-        // El ID del contador se mantiene igual.
         const rsvpCountDisplayForm = document.getElementById('rsvp-count-display-form'); 
         
         // Elementos para el Generador de VIBRA ✨
@@ -566,6 +570,39 @@
                 }
             }
         }
+        
+        /**
+         * NUEVO: Envía los datos de RSVP a la URL del Webhook de Google Apps Script.
+         * @param {object} data - Los datos de Nombre y Email del RSVP.
+         */
+        async function sendToGoogleSheets(data) {
+            if (GOOGLE_SHEETS_WEBHOOK_URL.includes("REEMPLAZA")) {
+                console.warn("ADVERTENCIA: La URL de Google Sheets no ha sido configurada. Saltando envío.");
+                return;
+            }
+
+            try {
+                const response = await fetch(GOOGLE_SHEETS_WEBHOOK_URL, {
+                    method: 'POST',
+                    mode: 'cors', // Necesario para peticiones de aplicaciones web
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data),
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                // Si la respuesta fue exitosa, no hacemos nada, solo registramos.
+                console.log("Datos enviados correctamente a Google Sheets.");
+
+            } catch (error) {
+                console.error("Error al enviar datos a Google Sheets:", error);
+                // No mostramos error al usuario final, ya que el RSVP en Firebase fue exitoso.
+            }
+        }
 
         /**
          * Inicializa Firebase y autentica al usuario.
@@ -596,7 +633,7 @@
                 console.log("Firebase inicializado y usuario autenticado.");
                 
                 // Llama a la función de conteo al inicializar Firebase
-                await fetchRsvpCount(); // NUEVO: Obtiene el conteo al cargar la página.
+                await fetchRsvpCount(); // Obtiene el conteo al cargar la página.
                 
             } catch (error) {
                 console.error("Error durante la inicialización de Firebase o autenticación:", error);
@@ -650,7 +687,7 @@
         }
 
         /**
-         * Guarda el registro de asistencia en Firestore.
+         * Guarda el registro de asistencia en Firestore y envía a Google Sheets.
          * @param {Event} e - El evento de envío del formulario.
          */
         async function handleRsvp(e) {
@@ -686,7 +723,7 @@
                     return;
                 }
 
-                // 2. Crear el objeto de registro
+                // 2. Crear el objeto de registro para Firestore y Google Sheets
                 const rsvpData = {
                     name: name,
                     email: email,
@@ -694,16 +731,20 @@
                     userId: userId,
                 };
                 
-                // 3. Guardar el registro en Firestore. 
+                // 3. Guardar el registro en Firestore.
                 // Usamos el correo saneado como ID del documento
                 const docRef = doc(db, rsvpCollectionPath, email.replace(/[.$#[\]/]/g, '_')); 
                 await setDoc(docRef, rsvpData);
 
+                // 4. NUEVO: Enviar los datos a Google Sheets (en paralelo)
+                // Usamos solo name y email para el script de Google, ya que el timestamp lo genera el script.
+                sendToGoogleSheets({ name: name, email: email });
+                
                 showMessage(`¡Registro exitoso! Tu asistencia ha sido confirma DO. ¡Nos vemos en Despecho!`, true);
                 rsvpForm.reset(); // Limpiar el formulario
                 
                 // Actualizar el contador de asistencia después del registro
-                await fetchRsvpCount(); // NUEVO: Actualiza el conteo después de registrar.
+                await fetchRsvpCount(); 
                 
             } catch (error) {
                 console.error("Error al registrar asistencia:", error);
@@ -718,6 +759,7 @@
          */
         async function fetchWithRetry(payload, retries = 5) {
             // El modelo y el endpoint son correctos. La clave se adjunta desde la variable global.
+            // La clave de API (apiKey) es la proporcionada por el usuario.
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
             const delay = 500 * (5 - retries) * (5 - retries); 
 
@@ -759,11 +801,8 @@
          * Genera un eslogan de fiesta usando la API de Gemini.
          */
         async function generateSlogan() {
-            // Se realiza una pequeña verificación si la clave está vacía para asegurar que el entorno la inyecte.
-            if (!apiKey && typeof __initial_auth_token !== 'undefined') {
-                // Si la clave es la variable vacía (lo esperado en Canvas), no hay problema.
-            } else if (!apiKey) {
-                 // Si estamos en local y la clave está vacía, mostramos advertencia.
+            // Si la clave es la variable vacía (lo esperado en Canvas), no hay problema.
+            if (!apiKey) {
                  console.error("La clave de API de Gemini está vacía. La generación de eslóganes no funcionará sin una clave válida.");
             }
             
