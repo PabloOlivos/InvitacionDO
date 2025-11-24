@@ -178,6 +178,13 @@
             color: var(--dark-background); 
             text-shadow: none;
         }
+        
+        /* Estilo específico para la caja del contador dentro del formulario */
+        .rsvp-count-box {
+            background-color: #2c0819; /* Un rojo/rosa más profundo para destacar */
+            border: 2px solid var(--neon-pink);
+            box-shadow: 0 0 10px rgba(233, 30, 99, 0.5);
+        }
     </style>
 </head>
 <body class="p-0 min-h-screen flex flex-col">
@@ -332,7 +339,7 @@
                         <!-- Ícono de Marcador de Mapa -->
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.828 0l-4.243-4.243a8 8 0 1111.314 0z" />
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 0 11-6 0 3 3 0 016 0z" />
                         </svg>
                         ¿Cómo llegar?
                     </a>
@@ -348,6 +355,16 @@
             <div class="max-w-xl mx-auto bg-gray-900 p-6 md:p-10 rounded-xl border border-gray-700 shadow-2xl">
                 <h2 class="text-3xl font-extrabold mb-8 text-center neon-text">Confirma tu Asistencia</h2>
                 
+                <!-- INICIO: CONTADOR DE ASISTENTES (DENTRO DEL FORMULARIO) -->
+                <!-- Este div se coloca después del H2 y antes del formulario -->
+                <div class="mb-8 p-4 rsvp-count-box rounded-lg shadow-lg text-center">
+                    <p class="text-sm uppercase tracking-widest text-gray-400 mb-1 font-semibold">¡Ya somos!</p>
+                    <!-- ID para el contador. Mantengo el mismo ID para la lógica JS -->
+                    <p id="rsvp-count-display-form" class="text-5xl font-extrabold neon-text">--</p>
+                    <p class="text-sm uppercase tracking-widest text-gray-400 mt-1 font-semibold">Confirmados al Despecho</p>
+                </div>
+                <!-- FIN: CONTADOR DE ASISTENTES -->
+
                 <form id="rsvpForm" class="space-y-6">
                     <!-- Mensaje de estado (éxito/error) -->
                     <div id="messageBox" class="p-4 rounded-lg text-center hidden font-semibold" role="alert"></div>
@@ -477,6 +494,8 @@
         const messageBox = document.getElementById('messageBox');
         const rsvpForm = document.getElementById('rsvpForm');
         const addToCalendarBtn = document.getElementById('addToCalendarBtn');
+        // El ID del contador se mantiene igual.
+        const rsvpCountDisplayForm = document.getElementById('rsvp-count-display-form'); 
         
         // Elementos para el Generador de VIBRA ✨
         const generateSloganBtn = document.getElementById('generateSloganBtn');
@@ -512,6 +531,39 @@
         }
 
         /**
+         * Obtiene y muestra el número de confirmaciones de asistencia.
+         */
+        async function fetchRsvpCount() {
+            if (!isAuthReady || !db) {
+                console.warn("No se puede obtener el conteo de RSVP, Firebase no está listo.");
+                return;
+            }
+            
+            // Colección pública para los RSVPs: /artifacts/{appId}/public/data/rsvps
+            const rsvpCollectionPath = `artifacts/${appId}/public/data/rsvps`;
+            
+            try {
+                const q = query(collection(db, rsvpCollectionPath));
+                const querySnapshot = await getDocs(q);
+                
+                const count = querySnapshot.size;
+                
+                // Actualizar el contador
+                if (rsvpCountDisplayForm) {
+                    rsvpCountDisplayForm.textContent = count;
+                }
+                
+                console.log(`Conteo de RSVPs obtenido: ${count}`);
+                
+            } catch (error) {
+                console.error("Error al obtener el conteo de RSVPs:", error);
+                if (rsvpCountDisplayForm) {
+                    rsvpCountDisplayForm.textContent = '0'; // Mostrar 0 si hay error
+                }
+            }
+        }
+
+        /**
          * Inicializa Firebase y autentica al usuario.
          */
         async function initializeFirebase() {
@@ -538,6 +590,9 @@
                 
                 isAuthReady = true;
                 console.log("Firebase inicializado y usuario autenticado.");
+                
+                // Llama a la función de conteo al inicializar Firebase
+                await fetchRsvpCount(); // NUEVO: Obtiene el conteo al cargar la página.
                 
             } catch (error) {
                 console.error("Error durante la inicialización de Firebase o autenticación:", error);
@@ -642,6 +697,9 @@
 
                 showMessage(`¡Registro exitoso! Tu asistencia ha sido confirma DO. ¡Nos vemos en Despecho!`, true);
                 rsvpForm.reset(); // Limpiar el formulario
+                
+                // Actualizar el contador de asistencia después del registro
+                await fetchRsvpCount(); // NUEVO: Actualiza el conteo después de registrar.
                 
             } catch (error) {
                 console.error("Error al registrar asistencia:", error);
